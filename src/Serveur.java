@@ -1,5 +1,7 @@
+import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
@@ -10,14 +12,43 @@ public class Serveur {
 		
 	public static void main(String[] args) throws Exception
 	{
-		// compteur incrementer a chaque connection dun client au server
+		// Compteur incrementer a chaque connection dun client au server
 		int clientNumber =0;
 		
-		// Adresse et port serveur
-		String serverAddress = "127.0.0.1";
-		int serverPort =5000;
+		String serverAddress = " ";
+		int serverPort = 0; 
+
+		boolean isIPGood= false;
+		boolean isPortGood = false;
+		 String rawAddress = " "; 
+		//---------------------------------Adresse et port du serveur---------------------------------------------------// 
+		System.out.println("Le serveur essaie de démarer");
+		// Demande ladresse du serveur voulu.
+		 do{
+			System.out.println("Entrer une adresse IP et un port en suivant ce format : XXX.XXX.XX.XX:PORT");
+			try {
+				// splits the IP and the port
+				rawAddress = readFromConsole(); 
+				if(rawAddress != null) {
+					String[] split = rawAddress.split("\\:"); 
+					serverAddress = split[0];
+					serverPort = Integer.parseInt(split[1]);
+					isIPGood = IPVerifier(serverAddress);
+					isPortGood = PortVerifier(serverPort);
+				}
+			}
+			catch(NumberFormatException e){
+				System.out.println("Une adresse ip ne peux pas contenir une lettre. \n");
+				isIPGood = false;
+			}
+			catch(ArrayIndexOutOfBoundsException ee) {
+				System.out.println("Une adresse ip ne peux pas contenir une valeur négative. \n");
+				isIPGood = false;
+			}
+		 } while(!isIPGood || !isPortGood );
+	
 		
-		// Creer la connection pr communiquer avec les clients
+		// Creer la connection pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
 		InetAddress serverIp = InetAddress.getByName(serverAddress);
@@ -36,12 +67,17 @@ public class Serveur {
 			}
 		}
 		finally {
-			// fermer la connection
+			// Fermer la connection
 			listener.close();
 		}
+		
+		
 	}
-	
-	// Thread 1ui se charge de traiter la demande de chaque client sur un socket particulier.
+		
+	/* Client handler. Permet d'avoir plusieurs connection possible.
+	 * Thread ce charge de traiter la demande de chaque client sur un socket particulier.
+	 * 
+	 */
 	private static class ClientHandler extends Thread {
 		private Socket socket;
 		private int clientNumber;
@@ -49,31 +85,103 @@ public class Serveur {
 		public ClientHandler(Socket socket,int clientNumber) {
 			this.socket = socket;
 			this.clientNumber = clientNumber;
-			System.out.println("New Connection with client #" + clientNumber + "at" + socket);
+			System.out.println("New Connection with client # " + clientNumber + " at " + socket);
 		}
-		
-		// une thread se charge denvoyer au client un msg de bienvenue.
+		// Une thread se charge denvoyer au client un msg de bienvenue.
 		public void run() {
+			
 			try {
 				// creer un canal sortant pour envoyer des msg au client.
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
 				// envoie un msg au client
 				out.writeUTF("Hello from server - you are client #" + clientNumber );
+				out.writeUTF("DD Master");
 			}
 			catch(IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
 			}
 			finally{
 				try {
-					// fermeture de la connection avec client.
-					socket.close();
+					socket.close(); // fermeture de la connection avec client.
 				}
 				catch(IOException e) {
 					System.out.println("Couldn't close a socket, what's going on?");
 				}
-				System.out.println("Connection with client#" + clientNumber + " closed");
-			}
+				System.out.println("Connection with client# " + clientNumber + " closed");
+		}
 		}
 	}	
 	
+	// verifies IpAdress
+	public static boolean IPVerifier(String inputIP) {
+		boolean isIPvalid = false; 
+		String[] toBeSplit = inputIP.split("\\."); 
+		
+	//	String noDotIP = inputIP.replaceAll("\\.",""); 
+	//	char[] IPchar = noDotIP.toCharArray();
+		if((inputIP != null) && (!inputIP.isEmpty())) {
+		//		for(int i =0; i < inputIP.length();i++) {		
+				//	if(Character.isDigit(IPchar[i])) {
+			if((!inputIP.endsWith("."))) {
+				if(toBeSplit.length == 4) {
+					for(String pos : toBeSplit) {
+						if(Integer.parseInt(pos) > 0 && Integer.parseInt(pos) < 255 ) {
+							isIPvalid =true;
+						}
+							else {
+								isIPvalid =false;
+								break;
+							}
+					}
+				}
+			} 
+				//	}
+					//else {
+					//	System.out.println("else");
+					//	isIPvalid =false;
+					//	// return isIPvalid;
+					//	break;
+					//}
+			//	}
+		}
+		if(!isIPvalid) System.out.println("Le format de l'adresse ip saisie : " + inputIP + " n'est pas valide. Veillez saisir une adresse valide de format : XXX.XXX.XX.XX" + "\n");		
+		else System.out.println("L'adresse ip saisie : " + inputIP + " est valide!");
+
+		return isIPvalid;
+	}
+	
+	public static  boolean PortVerifier(int port) {
+		boolean validPort = false;
+		if(port >= 5000 && port <= 5050) {
+			validPort = true;
+			System.out.println("Le port : " + port + " est valide!");
+		}	
+		else System.out.println("Le port : " + port + " n'est pas valide. Veillez inscrire un port valide compris entre 5000 a 5050. \n");
+			
+		return validPort;
+	}
+	
+	public static String readFromConsole() throws IOException {	
+		String ip = " ";
+		/*
+		Scanner input = new Scanner(System.in); // Initialise the reader
+		if(!input.hasNextLine() ) {
+			ip = input.nextLine();	
+		}
+		System.out.println("L'adresse inscrite est la suivante : " + ip + "\n");
+		input.close(); // closes the scanner
+		return ip;		
+		*/
+		try {
+			BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+			ip = input.readLine();
+			if(ip != null) System.out.println("L'adresse inscrite est la suivante : " + ip);	
+			// input.close();
+		}
+		catch(IOException e) {
+			System.out.println("Erreur lors de la lecture dans la console.");
+				throw e;
+			}
+		return ip;
+	}
 }
