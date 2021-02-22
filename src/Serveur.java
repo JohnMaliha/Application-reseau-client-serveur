@@ -110,9 +110,9 @@ public class Serveur {
 				DataInputStream in = new DataInputStream(socket.getInputStream());
 				request = in.readUTF();
 				
-				// Depending on the recives request
+				// Depending on the recived request
 				if(request.equals("exit")) {
-					System.out.println("Le client : " + clientNumber + " déconnecter"); 
+					System.out.println("Le client : " + clientNumber + " est déconnecter"); 
 					// sends a confirmation message to the client.
 					response = "Le client "+ clientNumber +" est déconnecté du serveur";
 					out.writeUTF(response);
