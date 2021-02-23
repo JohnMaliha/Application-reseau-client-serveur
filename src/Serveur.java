@@ -1,16 +1,20 @@
 import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class Serveur {
 	private static ServerSocket listener;
 	private static boolean isConnected = true;
+	public static String mainDirectory = System.getProperty("user.dir");
 
 	public static void main(String[] args) throws Exception
 	{
@@ -24,6 +28,7 @@ public class Serveur {
 		boolean isPortGood = false;
 		 String rawAddress = " "; 
 		//---------------------------------Adresse et port du serveur---------------------------------------------------// 
+		System.out.println("\n----------------------------Affichage du serveur-------------------------------- \n");
 		System.out.println("Le serveur essaie de démarer");
 		// Demande ladresse du serveur voulu.
 		 do{
@@ -53,31 +58,24 @@ public class Serveur {
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
 		InetAddress serverIp = InetAddress.getByName(serverAddress);
-		
+			
 		// Associer adresse et port a la connection
 		listener.bind(new InetSocketAddress(serverIp,serverPort));
-		
+			
 		System.out.format("The server is running on %s:%d\n",serverAddress,serverPort);
-		
-		try {
+			
+		try {	
 			// chaque nouvelle connection dun client declanche une execution de Run() de ClientHandler.
 			while(isConnected) {
 				// fct accept est bloquante. on creer un thread a chaque nouveau client.
-				new ClientHandler(listener.accept(),clientNumber++).start(); // start fait que on a 1 thread par connection
-				
+				new ClientHandler(listener.accept(),clientNumber++,rawAddress).start(); // start fait que on a 1 thread par connection	
 			}
 		}	
 		catch(Exception e){
 			listener.close();
 			isConnected = false; 
-			e.printStackTrace();
+			System.out.println("Une erreur c'est produite lors du démarage du serveur. \n");
 		}
-		/*
-		finally {
-			// arrete decouter sur le port
-			listener.close();
-		}
-		*/
 		
 	}
 	
@@ -88,54 +86,180 @@ public class Serveur {
 	private static class ClientHandler extends Thread {
 		private Socket socket;
 		private int clientNumber;
+		private String rawAddress;
 		
 		// constructeur
-		public ClientHandler(Socket socket,int clientNumber) {
+		public ClientHandler(Socket socket,int clientNumber,String rawAddress) {
 			this.socket = socket;
 			this.clientNumber = clientNumber;
+			this.rawAddress = rawAddress;
 			System.out.println("New Connection with client # " + clientNumber + " at " + socket);
 		}
-		// Une thread se charge denvoyer au client un msg de bienvenue.
-		@Override
+		// Un thread ce charge denvoyer au client un msg de bienvenue.
 		public void run() {
-			String request; 
-			String response;
+			String request = ""; // vient du client
+			String response = ""; // envoyer au client
+			
 			try {
-				// creer un canal sortant pour envoyer des msg au client.
-				DataOutputStream out = new DataOutputStream(socket.getOutputStream());
-				// envoie un msg au client
-				out.writeUTF("Hello from server - you are client #" + clientNumber );
-				
-				// we recived a request from the client.
 				DataInputStream in = new DataInputStream(socket.getInputStream());
-				request = in.readUTF();
+				DataOutputStream out = new DataOutputStream(socket.getOutputStream()); // creer un canal sortant pour envoyer des msg au client.
+
+				// envoie un msg au client
+				out.writeUTF("Hello from server - you are client #" + clientNumber + "\n" );
+				out.flush();
 				
-				// Depending on the recived request
-				if(request.equals("exit")) {
-					System.out.println("Le client : " + clientNumber + " est déconnecter"); 
-					// sends a confirmation message to the client.
-					response = "Le client "+ clientNumber +" est déconnecté du serveur";
-					out.writeUTF(response);
-					this.clientNumber--;
-					//socket.close();
-				}
-				// other requests.
-			}
+				while(isConnected) {
+				//	while(in.available() != 0)  // wait until the requests arrives.
+					
+					request = in.readUTF(); // we recived a request from the client.
+					String[] longRequest = new String[2];
+					longRequest= request.split("\\s+"); 
+					
+					// Depending on the recived request
+					if(request.equals("exit")) {
+						recivedCommand(rawAddress,request); 
+						System.out.println("Le client : " + clientNumber + " est déconnecter"); 
+						// sends a confirmation message to the client.
+						response = "Le client "+ clientNumber +" est déconnecté du serveur";
+						out.writeUTF(response);
+						out.flush();
+						break;
+					} 
+					
+					if(longRequest[0].equals("mkdir")) {
+						recivedCommand(rawAddress,request); 
+						response = createDir(longRequest[1]);						
+						out.writeUTF(response);
+						out.flush();
+					}
+					
+					if(request.equals("cd")) {
+						recivedCommand(rawAddress,request); 
+						System.out.println("cd detected");
+						response = "Message du serveur: cd detected";
+						out.writeUTF(response);
+						out.flush();
+					}
+					
+					if(request.equals("ls")) {
+						recivedCommand(rawAddress,request);
+						String[] toSend = ls();
+						out.write(toSend.length); // envoie au client le nb delements dans le dir.
+					  	out.flush();
+						for(int i =0; i< toSend.length;i++) {
+							out.writeUTF(toSend[i]); // envoie au client tt les fichier et folders.
+						}
+					 	out.flush();
+					}
+					if(request.equals("cd")) {
+					 		
+					}
+					 	
+					if(request.equals("upload")) {
+					 		
+					}
+					 	
+					if(request.equals("download")) {
+					 		
+					}
+					
+					
+					
+	
+			/*		switch (request) {
+						case "cd" :
+							System.out.println("cd detected");
+							response = "Message du serveur: cd detected";
+							out.writeUTF(response);
+							//break;
+						
+						case "ls":
+							System.out.println("ls detected");
+							//break;
+						
+					
+						case "mkdir":
+							
+							System.out.println("Création d'un nouveau dossier : " + requestArgs[1] +"\n");
+							CreateDir(requestArgs[1]);
+							response = "Message du serveur : Le dossier" + request + " a été créé ";
+							out.writeUTF(response);
+							break;
+
+				} */
+				} 
+				
+			//	socket.close();
+			//	in.close();
+			//	out.close();
+				out.flush();
+			//	listener.close();
+			} 
 			catch(IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
-			}
-//			finally{
-//				try {
-//					socket.close(); // fermeture de la connection avec client.
-//				}
-//				catch(IOException e) {
-//					System.out.println("Couldn't close a socket, what's going on?");
-//				}
-//				// System.out.println("Connection with client# " + clientNumber + " closed");
-//		}
-		}
+			} 
+		} 
 	}	
 	
+	private static void cd() {
+		
+	}
+		
+	private static String[] ls() {
+		// System.out.println(mainDirectory);
+		File path = new File(mainDirectory);
+		File[] allElementsinDir = path.listFiles(); // returns all the elements in current server dir.
+		String[] filesinFolders = new String[allElementsinDir.length];
+		for(int pos=0; pos< allElementsinDir.length; pos++) {
+			if(allElementsinDir[pos].isFile()) {
+				String isFile = "[File] " + allElementsinDir[pos].getName() +"\n";
+				filesinFolders[pos] = isFile;
+				//System.out.println(isFile);
+			}
+			else if(allElementsinDir[pos].isDirectory()) {
+				String isDir =  "[Folder] " + allElementsinDir[pos].getName() + "\n";
+				filesinFolders[pos] = isDir;
+				//System.out.println(isDir);
+			}
+			// System.out.println(filesFolders[pos] + "\n");
+		}
+		System.out.println("commande ls executer");
+		return filesinFolders;	
+		/*
+		for(File pos:allElementsinDir) {
+			if(pos.isFile()) {
+				String isFile = "[File] " + pos.getName() +"\n";
+				System.out.println(isFile);
+			}
+			// else its a folder
+			else if(pos.isDirectory()) {
+				String isDir =  "[Folder] " + pos.getName() + "\n";
+				System.out.println(isDir);
+			}	
+		}*/
+	} 
+	
+	private static void recivedCommand(String address, String command) {
+		SimpleDateFormat currentDateTime = new SimpleDateFormat("yyyy-MM-dd@HH:mm:ss");
+		Date date = new Date();
+		String info = "[" + address + "-"+  currentDateTime.format(date) +  "]" +  ": " + command + "\n"; 
+		System.out.println(info);
+		
+	}
+	private static String createDir(String dir) {
+		boolean isFileCreated;
+		File file = new File(dir); 
+		isFileCreated = file.mkdir();
+		
+		if(isFileCreated) {
+			System.out.println("Le dossier : "+ dir +" a été créer");
+			return "Le dossier : "+ dir +" a été créé";
+		}
+		else {
+			System.out.println("Une erreur s'est produite lors de la création du dossier :" + dir);
+			return "Une erreur s'est produite lors de la création du dossier :" + dir;
+		}
+	}
 	// verifies IpAdress
 	public static boolean IPVerifier(String inputIP) {
 		boolean isIPvalid = false; 
@@ -187,4 +311,5 @@ public class Serveur {
 			}
 		return ip;
 	}
+
 }
