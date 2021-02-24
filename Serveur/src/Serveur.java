@@ -214,7 +214,11 @@ public class Serveur {
 		/*
 		 * 
 		 */
-		private String cd(String changeDir) {
+		private String cd(String changeDir) throws IOException {
+		
+			DataOutputStream send = new DataOutputStream(socket.getOutputStream());
+		
+			
 			// va changer le currentDirectory pour permettre a ls d'afficher les elements dans le dir ou se on situe.
 			File file = new File(currentDirectory);
 			String newPath = currentDirectory + "\\" + changeDir;
@@ -234,9 +238,13 @@ public class Serveur {
 					currentDirectory = newFilePath.getAbsolutePath();	
 				}
 			System.out.println("cd success : " + currentDirectory + " " + "\n"); 
+			send.writeUTF("cd success : " + currentDirectory + " " + "\n");
+			send.flush();
 			}
 			else {
 				System.out.println("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n"); 
+				send.writeUTF("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n");
+				send.flush();
 			}
 			// return currentDirectory;			
 			return changeDir;

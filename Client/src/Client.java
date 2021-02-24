@@ -93,9 +93,11 @@ public class Client {
 						//return;
 					}
 					else if (longRequest[0].equals("cd")) {
+						DataInputStream recive = new DataInputStream(socket.getInputStream());
 						response = in.readUTF();
 						System.out.println("Commande : " + request);
 						System.out.println( response);
+						System.out.println("Message du serveur: " + recive.readUTF());
 						// break;
 						//	return;
 					}
