@@ -1,5 +1,7 @@
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -109,7 +111,8 @@ public class Client {
 					}
 					 	
 					if(longRequest[0].equals("upload")) {
-					 		
+			            sendFile("Sent/test4k.jpg");
+			            out.flush();
 					}
 					 	
 					if(longRequest[0].equals("download")) {
@@ -128,6 +131,23 @@ public class Client {
 			// throw e; // debug
 		 }
 	}	
+	
+	 private static void sendFile(String path) throws Exception{
+	        int bytes = 0;
+	        File file = new File(path);
+	        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+	        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+	        
+	        // send file size
+	        dataOutputStream.writeLong(file.length());  
+	        // break file into chunks
+	        byte[] buffer = new byte[4*1024];
+	        while ((bytes=fileInputStream.read(buffer))!=-1){
+	            dataOutputStream.write(buffer,0,bytes);
+	        }
+            dataOutputStream.flush();
+	        fileInputStream.close();
+	    }
 	
 	private static void menu() {
 		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download et exit.");

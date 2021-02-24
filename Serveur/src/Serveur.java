@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.InetAddress;
@@ -101,6 +102,7 @@ public class Serveur {
 			this.currentDirectory = dir;
 			System.out.println("Nouvelle connection avec le client # " + clientNumber + " sur " + socket);
 		}
+		
 		// Un thread ce charge denvoyer au client un msg de bienvenue.
 		public void run() {
 			String request = ""; // vient du client
@@ -157,37 +159,19 @@ public class Serveur {
 					 	out.flush();
 					}
 			
-					if(request.equals("upload")) {
-					 		
+					if(longRequest[0].equals("upload")) {
+						recivedCommand(rawAddress,request);
+						
+			            out.flush();
 					}
 					 	
-					if(request.equals("download")) {
+					if(longRequest[0].equals("download")) {
+						recivedCommand(rawAddress,request);
+						receiveFile("files/");
+						out.flush();
+
 					 		
 					}
-					
-					
-			/*		switch (request) {
-						case "cd" :
-							System.out.println("cd detected");
-							response = "Message du serveur: cd detected";
-							out.writeUTF(response);
-							//break;
-						
-						case "ls":
-							System.out.println("ls detected");
-							//break;
-						
-					
-						case "mkdir":
-							
-							System.out.println("Création d'un nouveau dossier : " + requestArgs[1] +"\n");
-							CreateDir(requestArgs[1]);
-							response = "Message du serveur : Le dossier" + request + " a été créé ";
-							out.writeUTF(response);
-							break;
-
-				} */
-					
 				} 
 			// Fermeture des streams.
 				socket.close();
@@ -206,6 +190,29 @@ public class Serveur {
 		} 
 		
 		// Fonctions pour les commandes //
+		
+		/*
+		 * 
+		 */
+		 private void receiveFile(String fileName) throws Exception{
+			 	DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+			 	// DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+			 	
+		        int bytes = 0;
+		        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+		        
+		        long size = dataInputStream.readLong();     // read file size
+
+		        System.out.println("Taille du fichier" + dataInputStream.readLong());
+
+		        byte[] buffer = new byte[4*1024];
+		        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
+		            fileOutputStream.write(buffer,0,bytes);
+		            size -= bytes;      // read upto file size
+		        }
+		        fileOutputStream.close();
+		    }
+		
 		/*
 		 * 
 		 */
@@ -256,7 +263,7 @@ public class Serveur {
 			}
 			System.out.println("commande ls executer");
 			return arrayElementsinDir;
-			
+		} 
 			
 			/*
 			for(File pos:allElementsinDir) {
@@ -270,7 +277,7 @@ public class Serveur {
 					System.out.println(isDir);
 				}	
 			}*/
-		} 
+		
 		
 		private String createDir(String dir) {
 			String mkdir;
@@ -278,7 +285,7 @@ public class Serveur {
 			boolean isFileCreated;
 			File file = new File(mkdir); 
 			// System.out.println( file.getAbsolutePath());
-			isFileCreated = file.mkdir();  // permet de creer 2 fichiers si on met ex: 11/a il va creer dossier 11 et dedant le dossier a.
+			isFileCreated = file.mkdir();  // permet de creer le fichier
 			
 			if(isFileCreated) {
 				System.out.println("Le dossier : "+ dir +" a été créer");
