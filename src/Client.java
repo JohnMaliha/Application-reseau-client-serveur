@@ -70,8 +70,8 @@ public class Client {
 					request = scanner.nextLine();
 					out.writeUTF(request); // envoie ce que le client a ecrit au serveur.
 					out.flush();
-					String[] longRequest = new String[2];
-					longRequest = 	request.split("\\s+"); 
+					String[] longRequest = new String[2]; 
+					longRequest = 	request.split("\\s+"); // utilise pour les commandes qui ont un parametre. 
 					
 					// Depending on the requests that was send to the server.
 					if(request.equals("exit")) {
@@ -84,36 +84,35 @@ public class Client {
 					}	
 								
 					if(longRequest[0].equals("mkdir")) {
-						System.out.println("mkdir " + longRequest[1]);
+						System.out.println("Commande : " + request);
 						response = in.readUTF();
 						System.out.println( response);
 						// break;
 						//return;
 					}
-					else if (request.equals("cd")) {
+					else if (longRequest[0].equals("cd")) {
 						response = in.readUTF();
+						System.out.println("Commande : " + request);
 						System.out.println( response);
 						// break;
 						//	return;
 					}
 					else if(request.equals("ls")) {
 						int taille = in.read(); // recevoir la taille du nb des fichiers dans le repertoires
-						System.out.println(request); 
+						System.out.println("Commande : " + request); 
 						for(int i= 0; i< taille;i++) {
 							response = in.readUTF();
 							System.out.println(response);
 						}
+						if(taille == 0 ) System.out.println("Le dossier est vide \n");			
 						out.flush();
 					}
-					if(request.equals("cd")) {
-				 		
-					}
 					 	
-					if(request.equals("upload")) {
+					if(longRequest[0].equals("upload")) {
 					 		
 					}
 					 	
-					if(request.equals("download")) {
+					if(longRequest[0].equals("download")) {
 					 		
 					}
 					

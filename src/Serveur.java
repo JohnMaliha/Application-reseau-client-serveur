@@ -8,13 +8,17 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Serveur {
 	private static ServerSocket listener;
 	private static boolean isConnected = true;
-	public static String mainDirectory = System.getProperty("user.dir");
+	public static String mainDirectory = System.getProperty("user.dir"); 
+//	public static String currentDir = mainDirectory; 
 
 	public static void main(String[] args) throws Exception
 	{
@@ -68,7 +72,7 @@ public class Serveur {
 			// chaque nouvelle connection dun client declanche une execution de Run() de ClientHandler.
 			while(isConnected) {
 				// fct accept est bloquante. on creer un thread a chaque nouveau client.
-				new ClientHandler(listener.accept(),clientNumber++,rawAddress).start(); // start fait que on a 1 thread par connection	
+				new ClientHandler(listener.accept(),clientNumber++,rawAddress, mainDirectory).start(); // start fait que on a 1 thread par connection	
 			}
 		}	
 		catch(Exception e){
@@ -87,12 +91,14 @@ public class Serveur {
 		private Socket socket;
 		private int clientNumber;
 		private String rawAddress;
+		private String currentDirectory;
 		
 		// constructeur
-		public ClientHandler(Socket socket,int clientNumber,String rawAddress) {
+		public ClientHandler(Socket socket,int clientNumber,String rawAddress,String dir) {
 			this.socket = socket;
 			this.clientNumber = clientNumber;
 			this.rawAddress = rawAddress;
+			this.currentDirectory = dir;
 			System.out.println("New Connection with client # " + clientNumber + " at " + socket);
 		}
 		// Un thread ce charge denvoyer au client un msg de bienvenue.
@@ -125,18 +131,17 @@ public class Serveur {
 						out.flush();
 						break;
 					} 
-					
+					if(longRequest[0].equals("cd")) {
+						recivedCommand(rawAddress,request);
+					 	String currentPos = cd(longRequest[1]);
+					 	response = "Message du serveur : Vous etes dans le dossier : " + currentPos ;  
+					 	out.writeUTF(response);
+					 	out.flush();
+					}
+					 	
 					if(longRequest[0].equals("mkdir")) {
 						recivedCommand(rawAddress,request); 
 						response = createDir(longRequest[1]);						
-						out.writeUTF(response);
-						out.flush();
-					}
-					
-					if(request.equals("cd")) {
-						recivedCommand(rawAddress,request); 
-						System.out.println("cd detected");
-						response = "Message du serveur: cd detected";
 						out.writeUTF(response);
 						out.flush();
 					}
@@ -151,10 +156,7 @@ public class Serveur {
 						}
 					 	out.flush();
 					}
-					if(request.equals("cd")) {
-					 		
-					}
-					 	
+			
 					if(request.equals("upload")) {
 					 		
 					}
@@ -187,58 +189,114 @@ public class Serveur {
 							break;
 
 				} */
+					
 				} 
-				
+			// fermeture des streams.
 			//	socket.close();
-			//	in.close();
-			//	out.close();
+				in.close();
+				out.close();
 				out.flush();
 			//	listener.close();
 			} 
 			catch(IOException e) {
 				System.out.println("Error handling client#" + clientNumber + ": " + e);
+				
 			} 
+			catch(Exception ee) {
+				System.out.println("Une erreur s'est produite" +  " " + ee);
+				throw ee;
+			}
 		} 
+		/*
+		 * 
+		 */
+		private String cd(String changeDir) {
+			// va changer le currentDirectory pour permettre a ls d'afficher les elements dans le dir ou se on situe.
+			File file = new File(currentDirectory);
+			Path path = Paths.get(currentDirectory); 
+					
+			if(file.exists() && Files.exists(path)) {
+				if(changeDir.equals("..")) {	
+					currentDirectory = file.getParent(); // on sort du dossier courant si on fait cd ..			
+					if(!file.getParent().equals(mainDirectory)) {
+						currentDirectory = mainDirectory; // on veut rester dans le path du projet.
+					}
+				}			
+				else {
+					String tempPath = mainDirectory + "\\" + changeDir;
+					File temp = new File(tempPath);
+					currentDirectory = temp.getAbsolutePath();	
+				}
+			}
+			else {
+				System.out.println("Le chemin : " + currentDirectory + "n'existe pas" + "\n"); 
+			}
+			System.out.println("cd success : " + currentDirectory + "\n"); 
+			return currentDirectory;
+		}
+			
+		private String[] ls() {
+			// System.out.println(mainDirectory);
+			File path = new File(currentDirectory); // sera updated selon le currentDirectory. 
+			File[] allElementsinDir = path.listFiles(); // returns all the elements in current server dir.
+			String[] arrayElementsinDir = new String[allElementsinDir.length];
+			
+			for(int pos=0; pos< allElementsinDir.length; pos++) {
+				if(allElementsinDir[pos].isFile()) {
+					String isFile = "[File] " + allElementsinDir[pos].getName() +"\n";
+					arrayElementsinDir[pos] = isFile;
+					//System.out.println(isFile);
+				}
+				else if(allElementsinDir[pos].isDirectory()) {
+					String isDir =  "[Folder] " + allElementsinDir[pos].getName() + "\n";
+					arrayElementsinDir[pos] = isDir;
+					//System.out.println(isDir);
+				}
+				// System.out.println(filesFolders[pos] + "\n");
+			}
+			System.out.println("commande ls executer");
+			return arrayElementsinDir;
+			
+			
+			/*
+			for(File pos:allElementsinDir) {
+				if(pos.isFile()) {
+					String isFile = "[File] " + pos.getName() +"\n";
+					System.out.println(isFile);
+				}
+				// else its a folder
+				else if(pos.isDirectory()) {
+					String isDir =  "[Folder] " + pos.getName() + "\n";
+					System.out.println(isDir);
+				}	
+			}*/
+		} 
+		
+		private String createDir(String dir) {
+			String mkdir;
+			mkdir = currentDirectory + "\\" +dir;
+			boolean isFileCreated;
+			File file = new File(mkdir); 
+			System.out.println(file.getAbsolutePath());
+			isFileCreated = file.mkdir();  // permet de creer 2 fichiers si on met ex: 11/a il va creer dossier 11 et dedant le dossier a.
+			
+			if(isFileCreated) {
+				System.out.println("Le dossier : "+ dir +" a été créer");
+				return "Le dossier : "+ dir +" a été créé";
+			}
+			else {
+				System.out.println("Une erreur s'est produite lors de la création du dossier :" + dir);
+				return "Une erreur s'est produite lors de la création du dossier :" + dir;
+			}
+		}	
+		
+		
 	}	
 	
-	private static void cd() {
-		
-	}
-		
-	private static String[] ls() {
-		// System.out.println(mainDirectory);
-		File path = new File(mainDirectory);
-		File[] allElementsinDir = path.listFiles(); // returns all the elements in current server dir.
-		String[] filesinFolders = new String[allElementsinDir.length];
-		for(int pos=0; pos< allElementsinDir.length; pos++) {
-			if(allElementsinDir[pos].isFile()) {
-				String isFile = "[File] " + allElementsinDir[pos].getName() +"\n";
-				filesinFolders[pos] = isFile;
-				//System.out.println(isFile);
-			}
-			else if(allElementsinDir[pos].isDirectory()) {
-				String isDir =  "[Folder] " + allElementsinDir[pos].getName() + "\n";
-				filesinFolders[pos] = isDir;
-				//System.out.println(isDir);
-			}
-			// System.out.println(filesFolders[pos] + "\n");
-		}
-		System.out.println("commande ls executer");
-		return filesinFolders;	
-		/*
-		for(File pos:allElementsinDir) {
-			if(pos.isFile()) {
-				String isFile = "[File] " + pos.getName() +"\n";
-				System.out.println(isFile);
-			}
-			// else its a folder
-			else if(pos.isDirectory()) {
-				String isDir =  "[Folder] " + pos.getName() + "\n";
-				System.out.println(isDir);
-			}	
-		}*/
-	} 
 	
+	/*
+	 * 
+	 */
 	private static void recivedCommand(String address, String command) {
 		SimpleDateFormat currentDateTime = new SimpleDateFormat("yyyy-MM-dd@HH:mm:ss");
 		Date date = new Date();
@@ -246,20 +304,10 @@ public class Serveur {
 		System.out.println(info);
 		
 	}
-	private static String createDir(String dir) {
-		boolean isFileCreated;
-		File file = new File(dir); 
-		isFileCreated = file.mkdir();
-		
-		if(isFileCreated) {
-			System.out.println("Le dossier : "+ dir +" a été créer");
-			return "Le dossier : "+ dir +" a été créé";
-		}
-		else {
-			System.out.println("Une erreur s'est produite lors de la création du dossier :" + dir);
-			return "Une erreur s'est produite lors de la création du dossier :" + dir;
-		}
-	}
+	
+	/*
+	 * 
+	 */
 	// verifies IpAdress
 	public static boolean IPVerifier(String inputIP) {
 		boolean isIPvalid = false; 
@@ -286,6 +334,9 @@ public class Serveur {
 		return isIPvalid;
 	}
 	
+	/*
+	 * 
+	 */
 	public static  boolean PortVerifier(int port) {
 		boolean validPort = false;
 		if(port >= 5000 && port <= 5050) {
@@ -296,6 +347,10 @@ public class Serveur {
 			
 		return validPort;
 	}
+	
+	/*
+	 * 
+	 */
 	
 	public static String readFromConsole() throws IOException {	
 		String ip = " ";
