@@ -228,7 +228,7 @@ public class Serveur {
 			if(file.exists() && Files.exists(path)){ // si le cd peut etre execute.
 				if(changeDir.equals("..")) {	
 					currentDirectory = file.getParent(); // on sort du dossier courant si on fait cd ..			
-					if(!file.getParent().equals(mainDirectory)) {
+					if(file.getParent().equals(mainDirectory)) {
 						currentDirectory = mainDirectory; // on veut rester dans le path du projet.
 					}
 					changeDir = "Retour en arriere"; 

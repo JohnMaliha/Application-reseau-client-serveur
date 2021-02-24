@@ -85,7 +85,7 @@ public class Client {
 						break;
 					}	
 								
-					if(longRequest[0].equals("mkdir")) {
+					else if(longRequest[0].equals("mkdir")) {
 						System.out.println("Commande : " + request);
 						response = in.readUTF();
 						System.out.println( response);
@@ -112,13 +112,17 @@ public class Client {
 						out.flush();
 					}
 					 	
-					if(longRequest[0].equals("upload")) {
+					else if(longRequest[0].equals("upload")) {
 			            sendFile("Sent/test4k.jpg");
 			            out.flush();
 					}
 					 	
-					if(longRequest[0].equals("download")) {
+					else if(longRequest[0].equals("download")) {
 					 		
+					}		
+					
+					else {
+						System.out.println("Mauvaise commande. Reesayer \n");
 					}
 					
 				}
