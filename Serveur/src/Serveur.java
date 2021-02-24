@@ -18,14 +18,12 @@ import java.util.Date;
 public class Serveur {
 	private static ServerSocket listener;
 	private static boolean isConnected = true;
-	public static String mainDirectory = System.getProperty("user.dir"); 
-//	public static String currentDir = mainDirectory; 
+	public static String mainDirectory = new File(System.getProperty("user.dir")).getParent().toString();; 
 
 	public static void main(String[] args) throws Exception
 	{
 		// Compteur incrementer a chaque connection dun client au server
 		int clientNumber =0;
-
 		String serverAddress = " ";
 		int serverPort = 0; 
 
@@ -228,6 +226,7 @@ public class Serveur {
 					currentDirectory = file.getParent(); // on sort du dossier courant si on fait cd ..			
 					if(!file.getParent().equals(mainDirectory)) {
 						currentDirectory = mainDirectory; // on veut rester dans le path du projet.
+						changeDir = "Retour en arriere"; 
 					}
 				}			
 				else {
@@ -239,7 +238,8 @@ public class Serveur {
 			else {
 				System.out.println("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n"); 
 			}
-			return currentDirectory;
+			// return currentDirectory;			
+			return changeDir;
 		}
 			
 		private String[] ls() {
