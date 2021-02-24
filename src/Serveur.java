@@ -230,7 +230,7 @@ public class Serveur {
 			System.out.println("cd success : " + currentDirectory+ " " + "\n"); 
 			}
 			else {
-				System.out.println("Le chemin : " + currentDirectory + " n'existe pas" + "\n"); 
+				System.out.println("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n"); 
 			}
 			return currentDirectory;
 		}
@@ -277,7 +277,7 @@ public class Serveur {
 			mkdir = currentDirectory + "\\" +dir;
 			boolean isFileCreated;
 			File file = new File(mkdir); 
-			System.out.println(file.getAbsolutePath());
+			// System.out.println( file.getAbsolutePath());
 			isFileCreated = file.mkdir();  // permet de creer 2 fichiers si on met ex: 11/a il va creer dossier 11 et dedant le dossier a.
 			
 			if(isFileCreated) {
