@@ -18,7 +18,7 @@ public class Client {
 		boolean isPortGood = false;
 		
 		System.out.println("\n----------------------------Affichage du client-------------------------------- \n");
-		System.out.println("Le client essaie de se connecter au serveur");
+		System.out.println("Le client tente de se connecter au serveur");
 		 do{
 			System.out.println("Entrer l'adresse IP du serveur et un port en suivant ce format : XXX.XXX.XX.XX:PORT");
 			try {
@@ -51,7 +51,7 @@ public class Client {
 			 	
 			 	// LE CLient se connecte au serveur. (Nouvelle connection)
 				socket = new Socket(clientAddress,clientPort);
-				System.out.format("Connected to server on  %s:%d \n\n" , clientAddress,clientPort);
+				System.out.format("Connecté au serveur sur  %s:%d \n\n" , clientAddress,clientPort);
 				menu();
 
 				String request = "";
@@ -104,7 +104,7 @@ public class Client {
 							response = in.readUTF();
 							System.out.println(response);
 						}
-						if(taille == 0 ) System.out.println("Le dossier est vide \n");			
+						if(taille == 0) System.out.println("Le dossier est vide \n");			
 						out.flush();
 					}
 					 	
@@ -130,12 +130,13 @@ public class Client {
 	}	
 	
 	private static void menu() {
-		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download,exit.");
-		System.out.println("Utiliser la commande cd <repertoire> pour se dépalcer vers un repertoire parent ou enfant");
-		System.out.println("Utiliser la commande ls pour afficher les fichiers et documents present sur le repertoire courant du serveur");
-		System.out.println("Utiliser la commande mkdir pour creer un nouveau dossier");
-		System.out.println("Utiliser la commande upload <nom fichier> pour televerser un fichier sur le serveur");
-		System.out.println("Utiliser la commande download<nom fichier> pour telecharger un fichier du serveur vers le repertoire local du client");
-		System.out.println("Utiliser la commande exit pour vous déconnecter du serveur \n");
+		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download et exit.");
+		System.out.println("Utiliser la commande cd <repertoire> pour se dépalcer vers un repertoire parent ou enfant.");
+		System.out.println("Utiliser la commande cd .. pour revenir vers un repertoire parent.");
+		System.out.println("Utiliser la commande ls pour afficher les fichiers et documents present sur le repertoire courant du serveur.");
+		System.out.println("Utiliser la commande mkdir pour creer un nouveau dossier.");
+		System.out.println("Utiliser la commande upload <nom fichier> pour televerser un fichier sur le serveur.");
+		System.out.println("Utiliser la commande download <nom fichier> pour telecharger un fichier du serveur vers le repertoire local du client.");
+		System.out.println("Utiliser la commande exit pour vous déconnecter du serveur. \n");
 	}
 }

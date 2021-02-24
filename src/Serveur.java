@@ -66,7 +66,7 @@ public class Serveur {
 		// Associer adresse et port a la connection
 		listener.bind(new InetSocketAddress(serverIp,serverPort));
 			
-		System.out.format("The server is running on %s:%d\n",serverAddress,serverPort);
+		System.out.format("Le serveur roule sur %s:%d\n",serverAddress,serverPort);
 			
 		try {	
 			// chaque nouvelle connection dun client declanche une execution de Run() de ClientHandler.
@@ -99,7 +99,7 @@ public class Serveur {
 			this.clientNumber = clientNumber;
 			this.rawAddress = rawAddress;
 			this.currentDirectory = dir;
-			System.out.println("New Connection with client # " + clientNumber + " at " + socket);
+			System.out.println("Nouvelle connection avec le client # " + clientNumber + " sur " + socket);
 		}
 		// Un thread ce charge denvoyer au client un msg de bienvenue.
 		public void run() {
@@ -111,13 +111,13 @@ public class Serveur {
 				DataOutputStream out = new DataOutputStream(socket.getOutputStream()); // creer un canal sortant pour envoyer des msg au client.
 
 				// envoie un msg au client
-				out.writeUTF("Hello from server - you are client #" + clientNumber + "\n" );
+				out.writeUTF("Allo du serveur! Vous etes le client #" + clientNumber + "\n" );
 				out.flush();
 				
 				while(isConnected) {
-				//	while(in.available() != 0)  // wait until the requests arrives.
+				//	while(in.available() != 0)  // attente active.
 					
-					request = in.readUTF(); // we recived a request from the client.
+					request = in.readUTF(); // on recoit une requete du client
 					String[] longRequest = new String[2];
 					longRequest= request.split("\\s+"); 
 					
@@ -166,8 +166,6 @@ public class Serveur {
 					}
 					
 					
-					
-	
 			/*		switch (request) {
 						case "cd" :
 							System.out.println("cd detected");
@@ -191,31 +189,34 @@ public class Serveur {
 				} */
 					
 				} 
-			// fermeture des streams.
-			//	socket.close();
+			// Fermeture des streams.
+				socket.close();
 				in.close();
 				out.close();
 				out.flush();
-			//	listener.close();
+				// listener.close();
 			} 
 			catch(IOException e) {
-				System.out.println("Error handling client#" + clientNumber + ": " + e);
+				System.out.println("Erreur lors du traitement du client # " + clientNumber + ": " + e);
 				
 			} 
 			catch(Exception ee) {
 				System.out.println("Une erreur s'est produite" +  " " + ee);
-				throw ee;
 			}
 		} 
+		
+		// Fonctions pour les commandes //
 		/*
 		 * 
 		 */
 		private String cd(String changeDir) {
 			// va changer le currentDirectory pour permettre a ls d'afficher les elements dans le dir ou se on situe.
 			File file = new File(currentDirectory);
-			Path path = Paths.get(currentDirectory); 
+			String newPath = currentDirectory + "\\" + changeDir;
+			Path path = Paths.get(newPath); // le path apres avoir fais un cd. On veut s'assurer que ce dernier existe.
 					
-			if(file.exists() && Files.exists(path)) {
+//			System.out.println("The path is : " + path + "does it exist ? " +Files.exists(path));
+			if(file.exists() && Files.exists(path)){ // si le cd peut etre execute.
 				if(changeDir.equals("..")) {	
 					currentDirectory = file.getParent(); // on sort du dossier courant si on fait cd ..			
 					if(!file.getParent().equals(mainDirectory)) {
@@ -223,21 +224,20 @@ public class Serveur {
 					}
 				}			
 				else {
-					String tempPath = mainDirectory + "\\" + changeDir;
-					File temp = new File(tempPath);
-					currentDirectory = temp.getAbsolutePath();	
+					File newFilePath = new File(newPath);
+					currentDirectory = newFilePath.getAbsolutePath();	
 				}
+			System.out.println("cd success : " + currentDirectory+ " " + "\n"); 
 			}
 			else {
-				System.out.println("Le chemin : " + currentDirectory + "n'existe pas" + "\n"); 
+				System.out.println("Le chemin : " + currentDirectory + " n'existe pas" + "\n"); 
 			}
-			System.out.println("cd success : " + currentDirectory + "\n"); 
 			return currentDirectory;
 		}
 			
 		private String[] ls() {
 			// System.out.println(mainDirectory);
-			File path = new File(currentDirectory); // sera updated selon le currentDirectory. 
+			File path = new File(currentDirectory); // sera mis a jour selon le currentDirectory. 
 			File[] allElementsinDir = path.listFiles(); // returns all the elements in current server dir.
 			String[] arrayElementsinDir = new String[allElementsinDir.length];
 			
@@ -293,6 +293,7 @@ public class Serveur {
 		
 	}	
 	
+	// Fonctions pour dans la classe Serveur. //
 	
 	/*
 	 * 
