@@ -226,14 +226,14 @@ public class Serveur {
 					currentDirectory = file.getParent(); // on sort du dossier courant si on fait cd ..			
 					if(!file.getParent().equals(mainDirectory)) {
 						currentDirectory = mainDirectory; // on veut rester dans le path du projet.
-						changeDir = "Retour en arriere"; 
 					}
+					changeDir = "Retour en arriere"; 
 				}			
 				else {
 					File newFilePath = new File(newPath);
 					currentDirectory = newFilePath.getAbsolutePath();	
 				}
-			System.out.println("cd success : " + currentDirectory+ " " + "\n"); 
+			System.out.println("cd success : " + currentDirectory + " " + "\n"); 
 			}
 			else {
 				System.out.println("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n"); 
