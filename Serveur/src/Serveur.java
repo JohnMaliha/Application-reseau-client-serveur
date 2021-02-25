@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -9,6 +10,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,7 +20,7 @@ import java.util.Date;
 public class Serveur {
 	private static ServerSocket listener;
 	private static boolean isConnected = true;
-	public static String mainDirectory = new File(System.getProperty("user.dir")).getParent().toString();; 
+	public static String mainDirectory = System.getProperty("user.dir");
 
 	public static void main(String[] args) throws Exception
 	{
@@ -121,11 +123,11 @@ public class Serveur {
 					String[] longRequest = new String[2];
 					longRequest= request.split("\\s+"); 
 					
-					// Depending on the recived request
+					// On verifie la requette recu du client.
 					if(request.equals("exit")) {
 						recivedCommand(rawAddress,request); 
 						System.out.println("Le client : " + clientNumber + " est déconnecter"); 
-						// sends a confirmation message to the client.
+						// envoie un msg de confirmation au client.
 						response = "Le client "+ clientNumber +" est déconnecté du serveur";
 						out.writeUTF(response);
 						out.flush();
@@ -159,16 +161,13 @@ public class Serveur {
 			
 					if(longRequest[0].equals("upload")) {
 						recivedCommand(rawAddress,request);
-						
+						receiveFile(longRequest[1]);
 			            out.flush();
 					}
 					 	
 					if(longRequest[0].equals("download")) {
 						recivedCommand(rawAddress,request);
-						receiveFile("files/");
-						out.flush();
-
-					 		
+						sendFile(longRequest[1]); 		
 					}
 				} 
 			// Fermeture des streams.
@@ -176,11 +175,10 @@ public class Serveur {
 				in.close();
 				out.close();
 				out.flush();
-				// listener.close();
 			} 
 			catch(IOException e) {
 				System.out.println("Erreur lors du traitement du client # " + clientNumber + ": " + e);
-				
+				e.printStackTrace();
 			} 
 			catch(Exception ee) {
 				System.out.println("Une erreur s'est produite" +  " " + ee);
@@ -190,26 +188,47 @@ public class Serveur {
 		// Fonctions pour les commandes //
 		
 		/*
+		 * Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+		 * 
 		 * 
 		 */
+		
 		 private void receiveFile(String fileName) throws Exception{
+			 	int bytes = 0;
+
 			 	DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
-			 	// DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
-			 	
-		        int bytes = 0;
 		        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
 		        
-		        long size = dataInputStream.readLong();     // read file size
-
-		        System.out.println("Taille du fichier" + dataInputStream.readLong());
+		        long size = dataInputStream.readLong();
 
 		        byte[] buffer = new byte[4*1024];
 		        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
 		            fileOutputStream.write(buffer,0,bytes);
-		            size -= bytes;      // read upto file size
+		            size -= bytes;
 		        }
 		        fileOutputStream.close();
+		        System.out.println("Le fichier " + fileName + " a bien ete téléversé.");
 		    }
+
+		 private void sendFile(String path) throws Exception{
+			 	int bytes = 0;
+		        
+			 	File file = new File(path);
+			 	FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
+		        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
+		        
+		        dataOutputStream.writeLong(file.length());  
+		        byte[] buffer = new byte[4*1024];
+		        
+		        while ((bytes=fileInputStream.read(buffer))!=-1){
+		            dataOutputStream.write(buffer,0,bytes);
+		        }
+		
+		        System.out.println("Le fichier " + path + " a bien ete téléchargé.");
+		        dataOutputStream.flush();
+		        fileInputStream.close();
+		    }
+		 
 		
 		/*
 		 * 

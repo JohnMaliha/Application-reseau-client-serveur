@@ -2,6 +2,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
@@ -89,8 +90,6 @@ public class Client {
 						System.out.println("Commande : " + request);
 						response = in.readUTF();
 						System.out.println( response);
-						// break;
-						//return;
 					}
 					else if (longRequest[0].equals("cd")) {
 						DataInputStream recive = new DataInputStream(socket.getInputStream());
@@ -98,8 +97,6 @@ public class Client {
 						System.out.println("Commande : " + request);
 						System.out.println( response);
 						System.out.println("Message du serveur: " + recive.readUTF());
-						// break;
-						//	return;
 					}
 					else if(request.equals("ls")) {
 						int taille = in.read(); // recevoir la taille du nb des fichiers dans le repertoires
@@ -113,12 +110,15 @@ public class Client {
 					}
 					 	
 					else if(longRequest[0].equals("upload")) {
-			            sendFile("Sent/test4k.jpg");
-			            out.flush();
+			            System.out.println("Commande : " + request); 
+						sendFile(longRequest[1]);
+						System.out.println("Le fichier " + longRequest[1] + " a bien ete téléversé.");
 					}
 					 	
 					else if(longRequest[0].equals("download")) {
-					 		
+						System.out.println("Commande : " + request); 
+						receiveFile(longRequest[1]);
+				        System.out.println("Le fichier " + longRequest[1] + " a bien ete téléchargé.");
 					}		
 					
 					else {
@@ -138,15 +138,22 @@ public class Client {
 		 }
 	}	
 	
+	/*
+	 * Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+	 * 
+	 * 
+	 */
+	
 	 private static void sendFile(String path) throws Exception{
 	        int bytes = 0;
+	        
 	        File file = new File(path);
+	        System.out.println("ALLO du sent file" + file.getAbsolutePath());
 	        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
 	        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 	        
-	        // send file size
 	        dataOutputStream.writeLong(file.length());  
-	        // break file into chunks
+
 	        byte[] buffer = new byte[4*1024];
 	        while ((bytes=fileInputStream.read(buffer))!=-1){
 	            dataOutputStream.write(buffer,0,bytes);
@@ -154,6 +161,23 @@ public class Client {
             dataOutputStream.flush();
 	        fileInputStream.close();
 	    }
+	
+	 
+	private static void receiveFile(String fileName) throws Exception{
+	        int bytes = 0;
+	        
+	        FileOutputStream fileOutputStream = new FileOutputStream(fileName);
+	        DataInputStream dataInputStream = new DataInputStream(socket.getInputStream());
+	        
+	        long size = dataInputStream.readLong();     // read file size
+
+	        byte[] buffer = new byte[4*1024];
+	        while (size > 0 && (bytes = dataInputStream.read(buffer, 0, (int)Math.min(buffer.length, size))) != -1) {
+	            fileOutputStream.write(buffer,0,bytes);
+	            size -= bytes;      // read upto file size
+	        }
+	            fileOutputStream.close();	   
+	    } 		
 	
 	private static void menu() {
 		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download et exit.");
