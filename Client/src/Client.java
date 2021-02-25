@@ -148,7 +148,7 @@ public class Client {
 	        int bytes = 0;
 	        
 	        File file = new File(path);
-	        System.out.println("ALLO du sent file" + file.getAbsolutePath());
+	     //   System.out.println("ALLO du sent file" + file.getAbsolutePath());
 	        FileInputStream fileInputStream = new FileInputStream(file.getAbsolutePath());
 	        DataOutputStream dataOutputStream = new DataOutputStream(socket.getOutputStream());
 	        

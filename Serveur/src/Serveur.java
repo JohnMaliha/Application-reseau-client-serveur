@@ -10,7 +10,6 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
