@@ -261,7 +261,7 @@ public class Serveur {
 			}
 			else {
 				System.out.println("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n"); 
-				send.writeUTF("Le chemin : " + currentDirectory + " " +  " n'existe pas" + "\n");
+				send.writeUTF("Le dossier : " + changeDir + " " +  " n'existe pas" + "\n");
 				send.flush();
 			}
 			// return currentDirectory;			
