@@ -1,0 +1,176 @@
+% Change the size of the paper your CV will be printed on
+% by entering either a4paper or letterpaper here.
+\documentclass[a4paper]{ReadableCV}
+
+% Set color of body text
+\color{black}
+
+\begin{document}
+	
+% Set page colour using X11names colour definitions
+\setPageColour{white}
+
+% Set header details being aligned to the right or left
+% If an image is displayed it will be shown on the
+% opposite side to what is set here.
+\setHeaderAlignment{left}
+
+% Set colour of all headings, header highlights
+\setHeadingColours{black}
+
+% Set image file to be displayed in header
+% If left blank no image is displayed
+%\setImage{profilepic.jpg}
+
+% If image not being displayed then user can
+% move contact details to opposite side of
+% page to name and jobtitle.
+% Use either opposite or below
+\setContactLocation{opposite}
+
+% Set up information needed for header.
+% If you do not want to include certain
+% information use {} instead. 
+\setYourName{John Maliha}
+\setYourMobileNo{514-348-7153}
+\setYourEmailAddr{johnmaliha@hotmail.com}
+\setYourWebAddr{johnm.tech}
+
+% Display header information 
+\showHeader
+\vspace{-5mm} %removes space
+\href{https://github.com/JohnMaliha} {Github |}
+\href{https://www.linkedin.com/in/john-maliha/}{Linkedin}
+
+% Set up whether section headings are on the left or right
+\setSectionAlignment{left}
+
+% Creates a new section title / heading
+\newHeading{Sommaire}
+
+{\Large - 3 ans d'expérience en programmation frontend et backend en java et C++.} \newline
+{\Large - Très bonne connaissance des frameworks Angular et React.} \newline
+{\Large - Très bonne capacité a résoudre des problèmes.} \newline
+{\Large - Excellente compétances en gestion des bases de donnees SQL et NoSQL(MongoBD).} \newline
+{\Large - Excellentes compétences en travail d'équipe et en communication orale.}
+
+% School education
+\newHeading{Éducation}
+
+\newCourse{2000 - 2002}{Course title}{Awarding body}{}
+\newCourse{1996 - 1998}{Course title}{Awarding body}{}
+
+{\Large Polytechnique Montréal  \par} 
+\title \textit{Baccalauréat en génie informatique}
+
+{\Large Collège Bois-de-Boulogne \par}
+\title \textit {Science Nature}
+
+
+
+\newHeading{Compétence Technique}
+
+% Add up to nine core skills. If they are
+% all not needed use {} instead.
+\addSkills{Java}
+		  {Python}
+		  {C/C++/C sharp}
+		  {SQL/No-SQL}
+		  {JavaScript/TypeScript}
+		  {HTML/CSS}
+		  {Latex}
+		  {VHDL}
+		  {Angular}
+		 
+\addSkills {Node.js}
+		  {Material-UI}
+		  {Git}
+		  {VS Code}
+		  {Pycharm}
+		  {Eclipse/IntelliJ/NetBeans}
+		  {Xilinx}
+		  {FPGA}
+		  {Assembleur x86}
+	       
+
+% This is training you have done in your own time
+\newHeading{Projets}
+\text \textbf{Application web}
+\textit{|Angular,TypeScript,Node.js,MongoDB,Canvas2D} \newline
+
+\text \textbf{Robot Autonome}
+\textit{|C++, linux, AVRLib C, ATMega, Makefile,Git}
+
+
+\newHeading{Expérience}
+
+
+
+% Set up whether job title or company printed first
+% Either use JobFirst or CompanyFirst
+\setJobCompanyOrder{JobFirst}
+
+% This displays the whole of the role information
+% including dates [1], job title [2],
+% company name [3] and role summary [4]
+% If a full history is required use \newrole and \roleAchievements
+% If only a brief description needed then just use \newrole
+\newRole{2016 -- present}
+        {Technicien en IT}
+        {Privée}
+        {Réparation d'appareil informatique et support technique.}
+
+\newRole{2017 -- 2018}
+{Technicien en Informatique}
+{Groupe Dijon}
+{Traitement et tri d'appareil informatique et conception de rapport.}
+
+\clearpage
+ 
+ 
+ 
+% Anything below creates a letter
+ 
+% Displays same header as on CV
+%\showHeader
+
+
+
+% Name and address must be present but
+% job title is optional
+%\setRecpJobTitle{Hiring Manager}
+%%%%%%%%%%\setRecpRoad{BigCorp Road}
+%%%%%%%%%\setRecpTown{BigCorp Town}
+%%%%%%%%\setRecpCity{BigCorp City}
+%%%%%%%\setRecpPostcode{X12 3YZ}
+
+%%%%%%\makeLetter
+
+% Do not delete \recpname unless you want to call the
+% recipient something other than the name defined above.
+%%%%%Dear \recpname,
+
+% Do not remove the following line
+%%%%\bigskip
+
+%%%Please find enclosed my CV in application for the post advertised in the [insert place advertised] %%on [date advert seen].
+
+%%The nature of my [qualification] has prepared me for this position. It involved a great deal of independent research, requiring initiative, self-motivation and a wide range of skills. One of my courses, [insert course], an understanding of the [insert sector] industry was essential. I found this subject very interesting.
+
+%I am a fast and accurate writer, with a keen eye for detail and I should be very grateful for the opportunity to progress. I am able to take on the responsibility of this position immediately, and have the enthusiasm and determination to ensure that I make a success of it.
+
+%Thank you for taking the time to consider this application and I look forward to hearing from you in the near future.
+
+% Do not remove the following line
+%\bigskip
+
+% comment, or uncomment, whichever you prefer to use
+%Yours sincerely, % if the opening is "Dear Mr(s) Doe,"
+%Yours faithfully, % if the opening is "Dear Sir or Madam,"
+
+% Insert name of image with your signature
+% If paper colour is not white best to use PNG
+% with transparency.
+%\closeletter{sig.png}
+
+\end{document}

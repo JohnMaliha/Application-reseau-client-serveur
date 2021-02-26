@@ -177,7 +177,7 @@ public class Serveur {
 			} 
 			catch(IOException e) {
 				System.out.println("Erreur lors du traitement du client # " + clientNumber + ": " + e);
-				e.printStackTrace();
+				// e.printStackTrace();
 			} 
 			catch(Exception ee) {
 				System.out.println("Une erreur s'est produite" +  " " + ee);
