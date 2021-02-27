@@ -16,11 +16,19 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+/*  Code serveur
+ *  Fichier : serveur.java
+ *  Par : John Maliha, Johnny Khoury et Daniel Capelo
+ */
+
 public class Serveur {
 	private static ServerSocket listener;
 	private static boolean isConnected = true;
 	public static String mainDirectory = System.getProperty("user.dir");
 
+	/* Fonction main
+	 * 
+	 */
 	public static void main(String[] args) throws Exception
 	{
 		// Compteur incrementer a chaque connection dun client au server
@@ -38,7 +46,7 @@ public class Serveur {
 		 do{
 			System.out.println("Entrer une adresse IP et un port en suivant ce format : XXX.XXX.XX.XX:PORT");
 			try {
-				// splits the IP and the port
+				// separe l'ip et le port.
 				rawAddress = readFromConsole(); 
 				if(rawAddress != null) {
 					String[] split = rawAddress.split("\\:"); 
@@ -61,11 +69,9 @@ public class Serveur {
 		// Creer la connection pour communiquer avec les clients
 		listener = new ServerSocket();
 		listener.setReuseAddress(true);
-		InetAddress serverIp = InetAddress.getByName(serverAddress);
-			
+		InetAddress serverIp = InetAddress.getByName(serverAddress);		
 		// Associer adresse et port a la connection
 		listener.bind(new InetSocketAddress(serverIp,serverPort));
-			
 		System.out.format("Le serveur roule sur %s:%d\n",serverAddress,serverPort);
 			
 		try {	
@@ -116,8 +122,8 @@ public class Serveur {
 				out.flush();
 				
 				while(isConnected) {
-				//	while(in.available() != 0)  // attente active.
-					
+					// Traitement a faire selon la commande envoyer par l'utilisateur.
+				//	while(in.available() != 0)  // attente active.					
 					request = in.readUTF(); // on recoit une requete du client
 					String[] longRequest = new String[2];
 					longRequest= request.split("\\s+"); 
@@ -186,9 +192,12 @@ public class Serveur {
 		
 		// Fonctions pour les commandes //
 		
-		/*
-		 * Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
-		 * 
+		
+		// Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+		
+		/*Fonction receiveFile
+		 * retourne un void
+		 * La fonction permet de recevoir un fichier qui a ete uploader du client.
 		 * 
 		 */
 		
@@ -209,6 +218,11 @@ public class Serveur {
 		        System.out.println("Le fichier " + fileName + " a bien ete téléversé.");
 		    }
 
+		 	/* Fonction sendFile
+		 	 * retourn un void
+		 	 * La fonction permet d'envoier un fichier.
+		 	 * 
+		 	 */
 		 private void sendFile(String path) throws Exception{
 			 	int bytes = 0;
 		        
@@ -229,14 +243,15 @@ public class Serveur {
 		    }
 		 
 		
-		/*
+		/* 	Fonction cd. 
+		 *  Retourne un string. 
+		 *  Permet de changer d'emplacement. On debute dans le dossier courant du projet. 
 		 * 
 		 */
 		private String cd(String changeDir) throws IOException {
 		
 			DataOutputStream send = new DataOutputStream(socket.getOutputStream());
-		
-			
+				
 			// va changer le currentDirectory pour permettre a ls d'afficher les elements dans le dir ou se on situe.
 			File file = new File(currentDirectory);
 			String newPath = currentDirectory + "\\" + changeDir;
@@ -264,12 +279,16 @@ public class Serveur {
 				send.writeUTF("Le dossier : " + changeDir + " " +  " n'existe pas" + "\n");
 				send.flush();
 			}
-			// return currentDirectory;			
 			return changeDir;
 		}
+		
+		/*  Fonction ls. 
+		 *  Retourne un tableau de string. 
+		 *  Permet d'afficher les fichiers et les dossiers dans le repertoire courant.
+		 *  
+		 */
 			
 		private String[] ls() {
-			// System.out.println(mainDirectory);
 			File path = new File(currentDirectory); // sera mis a jour selon le currentDirectory. 
 			File[] allElementsinDir = path.listFiles(); // returns all the elements in current server dir.
 			String[] arrayElementsinDir = new String[allElementsinDir.length];
@@ -278,32 +297,20 @@ public class Serveur {
 				if(allElementsinDir[pos].isFile()) {
 					String isFile = "[File] " + allElementsinDir[pos].getName() +"\n";
 					arrayElementsinDir[pos] = isFile;
-					//System.out.println(isFile);
 				}
 				else if(allElementsinDir[pos].isDirectory()) {
 					String isDir =  "[Folder] " + allElementsinDir[pos].getName() + "\n";
 					arrayElementsinDir[pos] = isDir;
-					//System.out.println(isDir);
 				}
-				// System.out.println(filesFolders[pos] + "\n");
 			}
 			System.out.println("commande ls executer");
 			return arrayElementsinDir;
 		} 
-			
-			/*
-			for(File pos:allElementsinDir) {
-				if(pos.isFile()) {
-					String isFile = "[File] " + pos.getName() +"\n";
-					System.out.println(isFile);
-				}
-				// else its a folder
-				else if(pos.isDirectory()) {
-					String isDir =  "[Folder] " + pos.getName() + "\n";
-					System.out.println(isDir);
-				}	
-			}*/
-		
+				
+		/*  Fonction createDir
+		 *  Retourne un string.
+		 *  Cree un dossier avec le nom specifier en parametre.
+		 */ 
 		
 		private String createDir(String dir) {
 			String mkdir;
@@ -326,11 +333,13 @@ public class Serveur {
 		
 	}	
 	
-	// Fonctions pour dans la classe Serveur. //
-	
-	/*
-	 * 
+	// Fonctions pour classe Serveur. Utiliser dans le main de serveur et le main de client.
+	 
+	/*  Fonction recivedCommand.
+	 *  Retourne un void.
+	 *  La fonction permet d'afficher les logs sur le serveur.
 	 */
+	
 	private static void recivedCommand(String address, String command) {
 		SimpleDateFormat currentDateTime = new SimpleDateFormat("yyyy-MM-dd@HH:mm:ss");
 		Date date = new Date();
@@ -339,10 +348,12 @@ public class Serveur {
 		
 	}
 	
-	/*
+	/* Fonction IPVerifier
+	 * Retourne un boolean
+	 * La fonction verifie cest l'ip saisie par l'utilisateur respecte une valeur ip. (sur 4 octets, pas de lettre, etc)
 	 * 
 	 */
-	// verifies IpAdress
+		
 	public static boolean IPVerifier(String inputIP) {
 		boolean isIPvalid = false; 
 		String[] toBeSplit = inputIP.split("\\."); 
@@ -368,9 +379,12 @@ public class Serveur {
 		return isIPvalid;
 	}
 	
-	/*
+	/* Fonction PortVerifier
+	 * Retourne un boolean
+	 * Verifie si le port est valide donc qu'il soit compris en 5000 et 5050.
 	 * 
 	 */
+	
 	public static  boolean PortVerifier(int port) {
 		boolean validPort = false;
 		if(port >= 5000 && port <= 5050) {
@@ -382,8 +396,9 @@ public class Serveur {
 		return validPort;
 	}
 	
-	/*
-	 * 
+	/* Fonction readFromConsole
+	 * Retourne un string
+	 * La fonction permet de lire l'adresse et le port saisie par l'utilisateur.
 	 */
 	
 	public static String readFromConsole() throws IOException {	
@@ -395,8 +410,8 @@ public class Serveur {
 			// input.close();
 		}
 		catch(IOException e) {
-			System.out.println("Erreur lors de la lecture dans la console.");
-				throw e;
+			System.out.println("Erreur lors de la lecture dans la console." + e);
+//				throw e;
 			}
 		return ip;
 	}

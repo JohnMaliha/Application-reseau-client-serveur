@@ -6,9 +6,19 @@ import java.io.FileOutputStream;
 import java.net.Socket;
 import java.util.Scanner;
 
+
+/*  Code client
+ *  Fichier : client.java
+ *  Par : John Maliha, Johnny Khoury et Daniel Capelo
+ */
+
 public class Client {
 	private static Socket socket;
-	private static boolean isConnected = true;
+	private static boolean isConnected = true;	
+	
+	/* Fonction main
+	 * 
+	 */
 	
 	public static void main(String[] args) throws Exception
 	{
@@ -25,7 +35,7 @@ public class Client {
 		 do{
 			System.out.println("Entrer l'adresse IP du serveur et un port en suivant ce format : XXX.XXX.XX.XX:PORT");
 			try {
-				// splits the IP and the port
+				// Separe l'ip et le port et les stockes dans differentes variables.
 				address = Serveur.readFromConsole(); 
 				if(address != null) {
 					String[] split = address.split("\\:"); 
@@ -49,7 +59,7 @@ public class Client {
 		 
 		 //------------------------------- Client code---------------------------------------------//
 		 try {
-			 	// Read the response written by the client to send to the server.
+			 	// On veut lire ce que l'utilisateur ecrit sur la console client.
 			 	Scanner scanner = new Scanner(System.in);
 			 	
 			 	// LE CLient se connecte au serveur. (Nouvelle connection)
@@ -69,17 +79,16 @@ public class Client {
 				System.out.println("Message du serveur : " + response);
 				
 				while(isConnected) {
-					// Sends the input of the client to the server.
+					// On envoie au serveur ce que l'utilisateur a saisie.
 					request = scanner.nextLine();
 					out.writeUTF(request); // envoie ce que le client a ecrit au serveur.
 					out.flush();
 					String[] longRequest = new String[2]; 
 					longRequest = 	request.split("\\s+"); // utilise pour les commandes qui ont un parametre. 
 					
-					// Depending on the requests that was send to the server.
+					// On verifie la commande ecrite par lutilisateur. 
 					if(request.equals("exit")) {
 						System.out.println("Vous avez été déconnecté avec succès.");
-					//	while(in.available() != 0)
 						response = in.readUTF();
 						System.out.println("Message du serveur :" + response);
 						socket.close();	// Fermer la connection
@@ -102,7 +111,7 @@ public class Client {
 						int taille = in.read(); // recevoir la taille du nb des fichiers dans le repertoires
 						System.out.println("Commande : " + request); 
 						for(int i= 0; i< taille;i++) {
-							response = in.readUTF();
+							response = in.readUTF();  // parcourir le tableau et affichier tout les elements dans le dossier.
 							System.out.println(response);
 						}
 						if(taille == 0) System.out.println("Le dossier est vide \n");			
@@ -138,12 +147,14 @@ public class Client {
 		 }
 	}	
 	
-	/*
-	 * Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
-	 * 
-	 * 
-	 */
 	
+	//  Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+	  
+	 /* Fonction sendFile
+	  * Retourne un void
+	  * Permet d'envoyer (upload) un fichier vers le serveur.
+	  */
+
 	 private static void sendFile(String path) throws Exception{
 	        int bytes = 0;
 	        
@@ -163,6 +174,11 @@ public class Client {
 	    }
 	
 	 
+	 /*Fonction receiveFile
+	  * retourne void
+	  * Permet de recevoir un fichier provenant du serveur.
+	  * 
+	  */
 	private static void receiveFile(String fileName) throws Exception{
 	        int bytes = 0;
 	        
@@ -178,6 +194,12 @@ public class Client {
 	        }
 	            fileOutputStream.close();	   
 	    } 		
+	
+	/*Fonction menu
+	 * retourne void
+	 * La fonction permet d'afficher le menu des commandes possible au client.
+	 * 
+	 */
 	
 	private static void menu() {
 		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download et exit.");

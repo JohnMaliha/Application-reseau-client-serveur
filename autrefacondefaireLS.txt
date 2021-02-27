@@ -1,0 +1,12 @@
+			/*
+			for(File pos:allElementsinDir) {
+				if(pos.isFile()) {
+					String isFile = "[File] " + pos.getName() +"\n";
+					System.out.println(isFile);
+				}
+				// else its a folder
+				else if(pos.isDirectory()) {
+					String isDir =  "[Folder] " + pos.getName() + "\n";
+					System.out.println(isDir);
+				}	
+			}*/
