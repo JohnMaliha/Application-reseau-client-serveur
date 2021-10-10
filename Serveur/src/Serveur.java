@@ -18,7 +18,7 @@ import java.util.Date;
 
 /*  Code serveur
  *  Fichier : serveur.java
- *  Par : John Maliha, Johnny Khoury et Daniel Capelo
+ *  Par : John Maliha
  */
 
 public class Serveur {
@@ -41,7 +41,7 @@ public class Serveur {
 		 String rawAddress = " "; 
 		//---------------------------------Adresse et port du serveur---------------------------------------------------// 
 		System.out.println("\n----------------------------Affichage du serveur-------------------------------- \n");
-		System.out.println("Le serveur essaie de démarer");
+		System.out.println("Le serveur essaie de dÃ©marer");
 		// Demande ladresse du serveur voulu.
 		 do{
 			System.out.println("Entrer une adresse IP et un port en suivant ce format : XXX.XXX.XX.XX:PORT");
@@ -61,7 +61,7 @@ public class Serveur {
 				isIPGood = false;
 			}
 			catch(ArrayIndexOutOfBoundsException ee) {
-				System.out.println("Une adresse ip ne peux pas contenir une valeur négative. \n");
+				System.out.println("Une adresse ip ne peux pas contenir une valeur nÃ©gative. \n");
 				isIPGood = false;
 			}
 		 } while(!isIPGood || !isPortGood );
@@ -84,7 +84,7 @@ public class Serveur {
 		catch(Exception e){
 			listener.close();
 			isConnected = false; 
-			System.out.println("Une erreur c'est produite lors du démarage du serveur. \n");
+			System.out.println("Une erreur c'est produite lors du dÃ©marage du serveur. \n");
 		}
 		
 	}
@@ -131,9 +131,9 @@ public class Serveur {
 					// On verifie la requette recu du client.
 					if(request.equals("exit")) {
 						recivedCommand(rawAddress,request); 
-						System.out.println("Le client : " + clientNumber + " est déconnecter"); 
+						System.out.println("Le client : " + clientNumber + " est dÃ©connecter"); 
 						// envoie un msg de confirmation au client.
-						response = "Le client "+ clientNumber +" est déconnecté du serveur";
+						response = "Le client "+ clientNumber +" est dÃ©connectÃ© du serveur";
 						out.writeUTF(response);
 						out.flush();
 						break;
@@ -193,7 +193,7 @@ public class Serveur {
 		// Fonctions pour les commandes //
 		
 		
-		// Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+		// MÃ©thodes utilisÃ©es pour tÃ©lÃ©verser/tÃ©lÃ©charger un fichier Ã  partir de/vers le serveur
 		
 		/*Fonction receiveFile
 		 * retourne un void
@@ -215,7 +215,7 @@ public class Serveur {
 		            size -= bytes;
 		        }
 		        fileOutputStream.close();
-		        System.out.println("Le fichier " + fileName + " a bien ete téléversé.");
+		        System.out.println("Le fichier " + fileName + " a bien ete tÃ©lÃ©versÃ©.");
 		    }
 
 		 	/* Fonction sendFile
@@ -237,7 +237,7 @@ public class Serveur {
 		            dataOutputStream.write(buffer,0,bytes);
 		        }
 		
-		        System.out.println("Le fichier " + path + " a bien ete téléchargé.");
+		        System.out.println("Le fichier " + path + " a bien ete tÃ©lÃ©chargÃ©.");
 		        dataOutputStream.flush();
 		        fileInputStream.close();
 		    }
@@ -321,12 +321,12 @@ public class Serveur {
 			isFileCreated = file.mkdir();  // permet de creer le fichier
 			
 			if(isFileCreated) {
-				System.out.println("Le dossier : "+ dir +" a été créer");
-				return "Le dossier : "+ dir +" a été créé";
+				System.out.println("Le dossier : "+ dir +" a Ã©tÃ© crÃ©er");
+				return "Le dossier : "+ dir +" a Ã©tÃ© crÃ©Ã©";
 			}
 			else {
-				System.out.println("Une erreur s'est produite lors de la création du dossier :" + dir);
-				return "Une erreur s'est produite lors de la création du dossier :" + dir;
+				System.out.println("Une erreur s'est produite lors de la crÃ©ation du dossier :" + dir);
+				return "Une erreur s'est produite lors de la crÃ©ation du dossier :" + dir;
 			}
 		}	
 		
