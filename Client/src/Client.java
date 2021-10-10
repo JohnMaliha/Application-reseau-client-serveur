@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 /*  Code client
  *  Fichier : client.java
- *  Par : John Maliha, Johnny Khoury et Daniel Capelo
+ *  Par : John Maliha
  */
 
 public class Client {
@@ -51,7 +51,7 @@ public class Client {
 				isIPGood = false;
 			}
 			catch(ArrayIndexOutOfBoundsException ee) {
-				System.out.println("Une adresse ip ne peux pas contenir une valeur négative. \n");
+				System.out.println("Une adresse ip ne peux pas contenir une valeur nÃ©gative. \n");
 				isIPGood = false;
 			}
 			
@@ -64,7 +64,7 @@ public class Client {
 			 	
 			 	// LE CLient se connecte au serveur. (Nouvelle connection)
 				socket = new Socket(clientAddress,clientPort);
-				System.out.format("Connecté au serveur sur  %s:%d \n\n" , clientAddress,clientPort);
+				System.out.format("ConnectÃ© au serveur sur  %s:%d \n\n" , clientAddress,clientPort);
 				menu();
 
 				String request = "";
@@ -88,7 +88,7 @@ public class Client {
 					
 					// On verifie la commande ecrite par lutilisateur. 
 					if(request.equals("exit")) {
-						System.out.println("Vous avez été déconnecté avec succès.");
+						System.out.println("Vous avez Ã©tÃ© dÃ©connectÃ© avec succÃ¨s.");
 						response = in.readUTF();
 						System.out.println("Message du serveur :" + response);
 						socket.close();	// Fermer la connection
@@ -121,13 +121,13 @@ public class Client {
 					else if(longRequest[0].equals("upload")) {
 			            System.out.println("Commande : " + request); 
 						sendFile(longRequest[1]);
-						System.out.println("Le fichier " + longRequest[1] + " a bien ete téléversé.");
+						System.out.println("Le fichier " + longRequest[1] + " a bien ete tÃ©lÃ©versÃ©.");
 					}
 					 	
 					else if(longRequest[0].equals("download")) {
 						System.out.println("Commande : " + request); 
 						receiveFile(longRequest[1]);
-				        System.out.println("Le fichier " + longRequest[1] + " a bien ete téléchargé.");
+				        System.out.println("Le fichier " + longRequest[1] + " a bien ete tÃ©lÃ©chargÃ©.");
 					}		
 					
 					else {
@@ -142,13 +142,13 @@ public class Client {
 				scanner.close();
 		 }
 		 catch(Exception e){
-			 System.out.println("Connection refusé. Vérifier si le serveur est connecté ou si l'adresse inscrite correspond a l'adresse du serveur. \n");
+			 System.out.println("Connection refusÃ©. VÃ©rifier si le serveur est connectÃ© ou si l'adresse inscrite correspond a l'adresse du serveur. \n");
 			// throw e; // debug
 		 }
 	}	
 	
 	
-	//  Méthodes utilisées pour téléverser/télécharger un fichier à partir de/vers le serveur
+	//  MÃ©thodes utilisÃ©es pour tÃ©lÃ©verser/tÃ©lÃ©charger un fichier Ã  partir de/vers le serveur
 	  
 	 /* Fonction sendFile
 	  * Retourne un void
@@ -203,12 +203,12 @@ public class Client {
 	
 	private static void menu() {
 		System.out.println("Voici les commandes disponibles : cd, ls,mkdir,upload,download et exit.");
-		System.out.println("Utiliser la commande cd <repertoire> pour se dépalcer vers un repertoire parent ou enfant.");
+		System.out.println("Utiliser la commande cd <repertoire> pour se dÃ©palcer vers un repertoire parent ou enfant.");
 		System.out.println("Utiliser la commande cd .. pour revenir vers un repertoire parent.");
 		System.out.println("Utiliser la commande ls pour afficher les fichiers et documents present sur le repertoire courant du serveur.");
 		System.out.println("Utiliser la commande mkdir pour creer un nouveau dossier.");
 		System.out.println("Utiliser la commande upload <nom fichier> pour televerser un fichier sur le serveur.");
 		System.out.println("Utiliser la commande download <nom fichier> pour telecharger un fichier du serveur vers le repertoire local du client.");
-		System.out.println("Utiliser la commande exit pour vous déconnecter du serveur. \n");
+		System.out.println("Utiliser la commande exit pour vous dÃ©connecter du serveur. \n");
 	}
 }
